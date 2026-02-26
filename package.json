@@ -6,7 +6,10 @@
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "report": "playwright show-report"
+    "test:ci": "playwright test --reporter=line",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "precommit:check": "npm run typecheck && npm run test:ci"
   },
   "repository": {
     "type": "git",
@@ -21,6 +24,10 @@
   },
   "homepage": "https://github.com/alxsht/saucedemo-playwright-test-project#readme",
   "devDependencies": {
-    "@playwright/test": "^1.58.2"
+    "@playwright/test": "^1.58.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
   }
 }
