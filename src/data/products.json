@@ -1,0 +1,20 @@
+{
+  "backpack": {
+    "name": "Sauce Labs Backpack"
+  },
+  "bikeLight": {
+    "name": "Sauce Labs Bike Light"
+  },
+  "boltTShirt": {
+    "name": "Sauce Labs Bolt T-Shirt"
+  },
+  "fleeceJacket": {
+    "name": "Sauce Labs Fleece Jacket"
+  },
+  "onesie": {
+    "name": "Sauce Labs Onesie"
+  },
+  "redTshirt": {
+    "name": "Test.allTheThings() T-Shirt (Red)"
+  }
+}
