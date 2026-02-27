@@ -1,5 +1,5 @@
 // tests/auth.spec.ts
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { LoginPage } from '../src/pages/LoginPage';
 import { InventoryPage } from '../src/pages/InventoryPage';
 import users from '../src/data/users.json';
@@ -41,11 +41,28 @@ test.describe('login flow', () => {
     await login.assertOnLoginPage();
   });
 
-  test('auth: locked out user cannot login', async ({}) => {
+  test('auth: locked out user cannot login', async ({ }) => {
 
     // Attempt login with locked out user credentials
     await login.login(users.lockedOut.username, users.lockedOut.password);
     await login.assertErrorContains('Epic sadface: Sorry, this user has been locked out.');
     await login.assertOnLoginPage();
+  });
+
+  test('performance_glitch_user: login is significantly delayed (known user defect)', async ({ page }) => {
+    const inventory = new InventoryPage(page);
+    const start = Date.now();
+
+    await login.login(
+      users.performance.username,
+      users.performance.password
+    );
+
+    await inventory.expectLoaded();
+
+    const duration = Date.now() - start;
+
+    // Expect login to take significantly longer than normal due to known performance defect with this user
+    expect(duration).toBeGreaterThan(3000);
   });
 });
