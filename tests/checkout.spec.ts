@@ -1,12 +1,12 @@
 // tests/checkout.spec.ts
 import { test, expect } from '@playwright/test';
-import users from '../src/data/users.json';
-import products from '../src/data/products.json';
-import checkoutUser from '../src/data/checkoutUser.json';
 import { LoginPage } from '../src/pages/LoginPage';
 import { InventoryPage } from '../src/pages/InventoryPage';
 import { CartPage } from '../src/pages/CartPage';
 import { CheckoutPage } from '../src/pages/CheckoutPage';
+import users from '../src/data/users.json';
+import products from '../src/data/products.json';
+import checkoutUser from '../src/data/checkoutUser.json';
 
 test.describe('checkout flow', () => {
   test('standard_user: can checkout 2 items and finish successfully', async ({ page }) => {

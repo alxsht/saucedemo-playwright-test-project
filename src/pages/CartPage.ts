@@ -15,7 +15,7 @@ export class CartPage {
     this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
   }
 
-  // Assert that we're on the cart page and it has loaded
+  // Verify that we're on the cart page and it has loaded
   async expectLoaded(): Promise<void> {
     await expectPageLoaded(this.page, {
       url: /\/cart\.html/,

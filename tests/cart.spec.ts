@@ -1,10 +1,10 @@
 // tests/cart.spec.ts
 import { test, expect } from '@playwright/test';
-import users from '../src/data/users.json';
-import products from '../src/data/products.json';
 import { LoginPage } from '../src/pages/LoginPage';
 import { InventoryPage } from '../src/pages/InventoryPage';
 import { CartPage } from '../src/pages/CartPage';
+import users from '../src/data/users.json';
+import products from '../src/data/products.json';
 
 test.describe('shopping cart flow', () => {
   test('standard_user: can add 2 items, then remove 1, cart updates correctly', async ({ page }) => {
