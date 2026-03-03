@@ -11,14 +11,19 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL || 'https://www.saucedemo.com',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
 
   retries: isCI ? 2 : 0,
 
   reporter: [
     ['list'],
-    ['html', { open: 'never' }]
+    ['html', { open: 'never', outputFolder: 'playwright-report' }],
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['allure-playwright']
   ],
+
+  reportSlowTests: { max: 5, threshold: 15_000 },
 
   projects: isCI
     ? [

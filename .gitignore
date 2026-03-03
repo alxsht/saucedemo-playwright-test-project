@@ -4,3 +4,5 @@ test-results/
 .env
 .DS_Store
 coverage/
+allure-results/
+allure-report/
