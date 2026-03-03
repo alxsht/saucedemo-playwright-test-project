@@ -1,87 +1,90 @@
 // src/pages/InventoryPage.ts
 import { expect, type Locator, type Page } from '@playwright/test';
-import { expectPageLoaded, inventoryItemByName } from '../utils/common';
 import { Menu } from '../components/Menu';
-import {
-  setInventorySort,
-  getInventoryItemNames,
-  getInventoryItemPrices,
-  expectSortedAsc,
-  expectSortedDesc,
-  SortValue,
-} from '../utils/common';
+import { isSortedAsc, isSortedDesc, parsePrice } from '../utils/common';
+import { BasePage } from './BasePage';
 
-export class InventoryPage {
-  private readonly inventoryList: Locator;
+export type SortValue = 'az' | 'za' | 'lohi' | 'hilo';
+
+export class InventoryPage extends BasePage {
   private readonly pageTitle: Locator;
+  private readonly inventoryList: Locator;
+  private readonly sortDropdown: Locator;
+  private readonly itemNames: Locator;
+  private readonly itemPrices: Locator;
 
   readonly menu: Menu;
 
-  constructor(private page: Page) {
-    this.inventoryList = page.locator('.inventory_list');
+  constructor(page: Page) {
+    super(page);
     this.pageTitle = page.locator('.title');
-
+    this.inventoryList = page.locator('.inventory_list');
+    this.sortDropdown = page.locator('[data-test="product-sort-container"]');
+    this.itemNames = page.locator('[data-test="inventory-item-name"]');
+    this.itemPrices = page.locator('[data-test="inventory-item-price"]');
     this.menu = new Menu(page);
   }
 
-  // Verify that we're on the inventory page and it has loaded
   async expectLoaded(): Promise<void> {
-    await expectPageLoaded(this.page, {
-      url: /\/inventory\.html/,
-      titleLocator: this.pageTitle,
-      expectedTitle: 'Products',
-      rootLocator: this.inventoryList,
-    });
+    await this.expectUrl(/\/inventory\.html/);
+    await this.expectTitle(this.pageTitle, 'Products');
+    await this.expectVisible(this.inventoryList);
   }
 
-  // Add a product to the cart by product name
   async addToCart(productName: string): Promise<void> {
-    const item = inventoryItemByName(this.page, productName);
+    const item = this.inventoryItemByName(productName);
     await expect(item).toBeVisible();
     await item.getByRole('button', { name: /add to cart/i }).click();
   }
 
-  // Remove a product from the cart by product name
   async removeFromCart(productName: string): Promise<void> {
-    const item = inventoryItemByName(this.page, productName);
+    const item = this.inventoryItemByName(productName);
     await expect(item).toBeVisible();
     await item.getByRole('button', { name: /remove/i }).click();
   }
 
-  async sortBy(value: SortValue) {
-    await setInventorySort(this.page, value);
+  async sortBy(value: SortValue): Promise<void> {
+    await expect(this.sortDropdown).toBeVisible();
+    await this.sortDropdown.selectOption(value);
   }
 
   async getNames(): Promise<string[]> {
-    return getInventoryItemNames(this.page);
+    await expect(this.itemNames.first()).toBeVisible();
+    const raw = await this.itemNames.allTextContents();
+    return raw.map((name) => name.trim()).filter(Boolean);
   }
 
   async getPrices(): Promise<number[]> {
-    return getInventoryItemPrices(this.page);
+    await expect(this.itemPrices.first()).toBeVisible();
+    const raw = await this.itemPrices.allTextContents();
+    return raw.map((price) => parsePrice(price.trim()));
   }
 
-  async expectNamesSortedAsc() {
+  async expectNamesSortedAsc(): Promise<void> {
     const names = await this.getNames();
-    expectSortedAsc(names, n => n.toLowerCase());
+    expect(isSortedAsc(names, (name) => name.toLowerCase())).toBe(true);
   }
 
-  async expectNamesSortedDesc() {
+  async expectNamesSortedDesc(): Promise<void> {
     const names = await this.getNames();
-    expectSortedDesc(names, n => n.toLowerCase());
+    expect(isSortedDesc(names, (name) => name.toLowerCase())).toBe(true);
   }
 
-  async expectPricesSortedAsc() {
-    const prices = await this.getPrices();
-    expectSortedAsc(prices);
+  async expectPricesSortedAsc(): Promise<void> {
+    expect(isSortedAsc(await this.getPrices())).toBe(true);
   }
 
-  async expectPricesSortedDesc() {
-    const prices = await this.getPrices();
-    expectSortedDesc(prices);
+  async expectPricesSortedDesc(): Promise<void> {
+    expect(isSortedDesc(await this.getPrices())).toBe(true);
   }
 
-  // Verify that two arrays are not in the same order.
-  assertDifferentOrder(a: string[], b: string[], message: string) {
+  assertDifferentOrder(a: string[], b: string[], message: string): void {
     expect(a, message).not.toEqual(b);
+  }
+
+  private inventoryItemByName(productName: string): Locator {
+    return this.page
+      .locator('.inventory_item')
+      .filter({ has: this.page.locator('[data-test="inventory-item-name"]', { hasText: productName }) });
   }
 }

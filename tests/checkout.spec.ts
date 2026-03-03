@@ -4,7 +4,7 @@ import { LoginPage } from '../src/pages/LoginPage';
 import { InventoryPage } from '../src/pages/InventoryPage';
 import { CartPage } from '../src/pages/CartPage';
 import { CheckoutPage } from '../src/pages/CheckoutPage';
-import users from '../src/data/users.json';
+import { users } from '../src/data/users';
 import products from '../src/data/products.json';
 import checkoutUser from '../src/data/checkoutUser.json';
 
@@ -19,25 +19,21 @@ test.describe('checkout flow', () => {
     await login.login(users.standard.username, users.standard.password);
     await inventory.expectLoaded();
 
-    // Add 2 products
     await inventory.addToCart(products.backpack.name);
     await inventory.addToCart(products.bikeLight.name);
 
     await inventory.menu.expectCartBadgeCount(2);
 
-    // Open cart and checkout
     await inventory.menu.openCart();
     await cart.expectLoaded();
     await cart.expectItemsCount(2);
 
     await cart.checkout();
 
-    // Fill info and continue to overview
     await checkout.expectInfoLoaded();
     await checkout.fillInformation(checkoutUser.valid);
     await checkout.continue();
 
-    // Verify overview shows correct items and price summary
     await checkout.expectOverviewLoaded();
     await checkout.expectOverviewItemVisible(products.backpack.name);
     await checkout.expectOverviewItemVisible(products.bikeLight.name);
@@ -59,14 +55,12 @@ test.describe('checkout flow', () => {
     await login.login(users.standard.username, users.standard.password);
     await inventory.expectLoaded();
 
-    // Add 1 product and proceed to checkout
     await inventory.addToCart(products.backpack.name);
     await inventory.menu.openCart();
     await cart.expectLoaded();
 
     await cart.checkout();
 
-    // Attempt to continue with missing first name
     await checkout.expectInfoLoaded();
     await checkout.fillInformation({
       firstName: '',
@@ -75,7 +69,6 @@ test.describe('checkout flow', () => {
     });
     await checkout.continue();
 
-    // Verify error message is shown and we're still on the info page
     await checkout.expectErrorContains('First Name is required');
     await checkout.expectInfoLoaded();
   });
@@ -90,7 +83,6 @@ test.describe('checkout flow', () => {
     await login.login(users.standard.username, users.standard.password);
     await inventory.expectLoaded();
 
-    // Add 1 product and proceed to checkout
     await inventory.addToCart(products.backpack.name);
     await inventory.menu.openCart();
     await cart.expectLoaded();
@@ -100,7 +92,6 @@ test.describe('checkout flow', () => {
 
     await checkout.cancel();
 
-    // Verify we're back on the cart page with the item still there
     await cart.expectLoaded();
     await cart.expectItemsCount(1);
     await cart.expectItemVisible(products.backpack.name);

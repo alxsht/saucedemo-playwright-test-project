@@ -2,8 +2,7 @@
 import { test } from '@playwright/test';
 import { LoginPage } from '../src/pages/LoginPage';
 import { InventoryPage } from '../src/pages/InventoryPage';
-import { expectUrlContains } from '../src/utils/common';
-import users from '../src/data/users.json';
+import { users } from '../src/data/users';
 import products from '../src/data/products.json';
 
 test.describe('logout flow', () => {
@@ -33,7 +32,7 @@ test.describe('logout flow', () => {
 
     // Assert session is cleared by navigating back to inventory page and verifying we can’t access it
     await page.goto('/inventory.html');
-    await expectUrlContains(page, /\/(index\.html)?$/);
+    await login.assertUrlIsLogin();
 
     // Stronger UI check
     await login.assertOnLoginPage();

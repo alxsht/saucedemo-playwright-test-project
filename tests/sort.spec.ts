@@ -2,7 +2,7 @@
 import { test } from '@playwright/test';
 import { LoginPage } from '../src/pages/LoginPage';
 import { InventoryPage } from '../src/pages/InventoryPage';
-import users from '../src/data/users.json';
+import { users } from '../src/data/users';
 
 test.describe('inventory sorting', () => {
   test('standard_user: can sort by name', async ({ page }) => {
