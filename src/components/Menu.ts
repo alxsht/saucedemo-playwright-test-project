@@ -5,18 +5,18 @@ export class Menu {
   private readonly cartLink: Locator;
   private readonly cartBadge: Locator;
   private readonly menuButton: Locator;
+  private readonly closeButton: Locator;
+  private readonly menuPanel: Locator;
+  private readonly logoutLink: Locator;
 
-  constructor(private page: Page) {
+  constructor(private readonly page: Page) {
     this.cartLink = page.locator('.shopping_cart_link');
     this.cartBadge = page.locator('.shopping_cart_badge');
     this.menuButton = page.locator('#react-burger-menu-btn');
+    this.closeButton = page.locator('#react-burger-cross-btn');
+    this.menuPanel = page.locator('.bm-menu-wrap');
+    this.logoutLink = page.locator('#logout_sidebar_link');
   }
-
-  private burgerBtn = this.page.locator('#react-burger-menu-btn');
-  private closeBtn = this.page.locator('#react-burger-cross-btn');
-
-  private menuPanel = this.page.locator('.bm-menu-wrap');
-  private logoutLink = this.page.locator('#logout_sidebar_link');
 
   async openCart(): Promise<void> {
     await this.cartLink.click();
@@ -27,27 +27,24 @@ export class Menu {
       await expect(this.cartBadge).toHaveCount(0);
       return;
     }
+
     await expect(this.cartBadge).toHaveText(String(count));
   }
 
   async openMenu(): Promise<void> {
+    await expect(this.menuButton).toBeVisible();
     await this.menuButton.click();
-  }
-
-  async open() {
-    await expect(this.burgerBtn).toBeVisible();
-    await this.burgerBtn.click();
     await expect(this.menuPanel).toBeVisible();
   }
 
-  async close() {
-    await expect(this.closeBtn).toBeVisible();
-    await this.closeBtn.click();
+  async closeMenu(): Promise<void> {
+    await expect(this.closeButton).toBeVisible();
+    await this.closeButton.click();
     await expect(this.menuPanel).toBeHidden();
   }
 
-  async logout() {
-    await this.open();
+  async logout(): Promise<void> {
+    await this.openMenu();
     await expect(this.logoutLink).toBeVisible();
     await this.logoutLink.click();
   }

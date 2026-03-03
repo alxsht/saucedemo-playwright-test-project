@@ -1,34 +1,31 @@
 // src/pages/CartPage.ts
 import { expect, type Locator, type Page } from '@playwright/test';
-import { expectPageLoaded } from '../utils/common';
+import { BasePage } from './BasePage';
 
-export class CartPage {
+export class CartPage extends BasePage {
   private readonly title: Locator;
+  private readonly cartList: Locator;
   private readonly cartItems: Locator;
   private readonly checkoutButton: Locator;
   private readonly continueShoppingButton: Locator;
 
-  constructor(private page: Page) {
+  constructor(page: Page) {
+    super(page);
     this.title = page.locator('.title');
+    this.cartList = page.locator('.cart_list');
     this.cartItems = page.locator('.cart_item');
     this.checkoutButton = page.locator('[data-test="checkout"]');
     this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
   }
 
-  // Verify that we're on the cart page and it has loaded
   async expectLoaded(): Promise<void> {
-    await expectPageLoaded(this.page, {
-      url: /\/cart\.html/,
-      titleLocator: this.title,
-      expectedTitle: 'Your Cart',
-      rootLocator: this.page.locator('.cart_list'),
-    });
+    await this.expectUrl(/\/cart\.html/);
+    await this.expectTitle(this.title, 'Your Cart');
+    await this.expectVisible(this.cartList);
   }
 
   async expectItemVisible(productName: string): Promise<void> {
-    await expect(
-      this.cartItemByName(productName)
-    ).toBeVisible();
+    await expect(this.cartItemByName(productName)).toBeVisible();
   }
 
   async expectItemsCount(count: number): Promise<void> {
@@ -51,12 +48,11 @@ export class CartPage {
 
     await expect(removeButton).toBeVisible();
     await removeButton.click();
-
     await expect(item).toHaveCount(0);
   }
 
   private cartItemByName(productName: string): Locator {
-    return this.page.locator('.cart_item').filter({
+    return this.cartItems.filter({
       has: this.page.locator('.inventory_item_name', { hasText: productName }),
     });
   }

@@ -1,14 +1,15 @@
 // src/pages/LoginPage.ts
 import { expect, type Locator, type Page } from '@playwright/test';
-import { goto } from '../utils/common';
+import { BasePage } from './BasePage';
 
-export class LoginPage {
+export class LoginPage extends BasePage {
   private readonly usernameInput: Locator;
   private readonly passwordInput: Locator;
   private readonly loginButton: Locator;
   private readonly errorBox: Locator;
 
-  constructor(private page: Page) {
+  constructor(page: Page) {
+    super(page);
     this.usernameInput = page.locator('#user-name');
     this.passwordInput = page.locator('#password');
     this.loginButton = page.locator('#login-button');
@@ -16,10 +17,9 @@ export class LoginPage {
   }
 
   async open(): Promise<void> {
-    await goto(this.page, '/');
+    await this.goto('/');
     await expect(this.loginButton).toBeVisible();
   }
-
 
   async login(username: string, password: string): Promise<void> {
     await this.usernameInput.fill(username);
@@ -36,5 +36,9 @@ export class LoginPage {
     await expect(this.usernameInput).toBeVisible();
     await expect(this.passwordInput).toBeVisible();
     await expect(this.loginButton).toBeVisible();
+  }
+
+  async assertUrlIsLogin(): Promise<void> {
+    await this.expectUrl(/\/(index\.html)?$/);
   }
 }
